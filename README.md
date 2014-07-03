@@ -62,8 +62,13 @@ Changes
 - split library into 2 files :
         - urdf.py
         - gazebo.py
-- packaging the lib to use it as a python module
 - catkinized package
+
+07/03/2014
+---------
+- recatkinized package : update __ini__.py, CMakeLists.txt
+- add sonar frames to urdf generation
+- bugfix : path of included files in ..robot.xacro file
 
 TODO
 ======

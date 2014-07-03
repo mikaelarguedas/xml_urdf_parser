@@ -24,9 +24,9 @@
 
 import sys
 import argparse
-from urdf_parser_py.urdf import URDF
-import urdf_parser_py.gazeboUrdf
-import urdf_parser_py.urdf as ur
+from xml_urdf_parser.urdf import URDF
+import xml_urdf_parser.gazeboUrdf
+import xml_urdf_parser.urdf as ur
 import subprocess
 import os
 import math
@@ -56,6 +56,7 @@ dictioNaoXacro= {
 'legs':'Feet',
 'arms':'gripper',
 'torso':'torso',
+'sonar':'Sonar',
 #'robot':'',
 }
 
@@ -165,6 +166,8 @@ def REP120func(robot):
     robot.add_link(ur.Link('r_sole'))
     robot.add_link(ur.Link('l_gripper'))
     robot.add_link(ur.Link('r_gripper'))
+
+
     if name == 'nao':
         diclinks = dictioNao
     elif name == 'romeo':
@@ -222,6 +225,15 @@ def REP120func(robot):
 'CameraBottom_frame', 'fixed', None,
 ur.Pose((Nao_offsets['CameraBottomOffsetX'],0,Nao_offsets['CameraBottomOffsetZ']),\
 (0,Nao_offsets['CameraBottomRotY'],0))))
+
+        #sonars
+        robot.add_link(ur.Link('LSonar'))
+        robot.add_link(ur.Link('RSonar'))
+        robot.add_joint(ur.Joint('LSonar_joint', 'torso',
+        'LSonar', 'fixed', None, ur.Pose((0.0507,0.03785,0.06035),(0,0.04365,-0.39265))))
+        robot.add_joint(ur.Joint('RSonar_joint', 'torso',
+        'RSonar', 'fixed', None, ur.Pose((0.0507,-0.03785,0.06035),(0,0.04365,0.39265))))
+
 
         # add joints accordingly
         robot.add_joint(ur.Joint('base_joint', 'base_link', 'torso', 'fixed',
@@ -324,7 +336,8 @@ def MeshesRes(robot,meshes):
                     if args.meshes == 'mesh':
                         colfile =  str(robot.links[link].visual.geometry.filename[0:robot.links[link].visual.geometry.filename.find('visual')]) + 'collision' + str(robot.links[link].visual.geometry.filename[robot.links[link].visual.geometry.filename.find('visual')+6:-4]) + '.ply' 
                     else: 
-                        colfile =  robot.links[link].visual.geometry.filename
+                        colfile =  str(robot.links[link].visual.geometry.filename[0:robot.links[link].visual.geometry.filename.find('visual')]) + 'collision' + str(robot.links[link].visual.geometry.filename[robot.links[link].visual.geometry.filename.find('visual')+6:-4]) + '.dae' 
+#                        colfile =  robot.links[link].visual.geometry.filename
                     robot.links[link].collision =  ur.Collision(ur.Mesh(colfile, robot.links[link].visual.geometry.scale))
     # 'include visuals xacro from Armin'
         else:
@@ -361,7 +374,9 @@ def exportXacroRobotElementList(robot,element):
                     root.appendChild(i.to_xml(doc))
         except AttributeError:
             pass
-                
+#    if args.output.find('/') != -1:
+#        filename = args.output[args.output.rfind('/')+1:args.output.find('.')]+ str(element) + '.xacro'
+#    else : 
     filename = args.output[0:args.output.find('.')]+ str(element) + '.xacro'
     print filename
     file = open(filename,'w') 
@@ -377,13 +392,23 @@ def exportXacroRobot(robot):
     for i in dictioNaoXacro.keys():
         print "exporting " +str(dictioNaoXacro[i]) + ' xacro' 
         exportXacroRobotChain(robot,i)
-        filenamerobot = args.output[0:args.output.find('.')]+ i + str('.xacro')
+        if args.output.find('/') != -1:
+            filenamerobot = args.output[args.output.rfind('/')+1:args.output.find('.')]+ i + '.xacro'
+        else : 
+            filenamerobot = args.output[0:args.output.find('.')]+ i + str('.xacro')
         root.appendChild(ur.short(doc,'xacro:include','filename',filenamerobot))
 
     exportXacroRobotElementList(robot,'Transmission')
-    root.appendChild(ur.short(doc,'xacro:include','filename',args.output[0:args.output.find('.')]+ 'Transmission.xacro'))
     exportXacroRobotElementList(robot,'Gazebo')
-    root.appendChild(ur.short(doc,'xacro:include','filename',args.output[0:args.output.find('.')]+ 'Gazebo.xacro'))
+    if args.output.find('/') != -1:
+        root.appendChild(ur.short(doc,'xacro:include','filename',args.output[args.output.rfind('/'):args.output.find('.')]+ 'Transmission.xacro'))
+        root.appendChild(ur.short(doc,'xacro:include','filename',args.output[args.output.rfind('/'):args.output.find('.')]+ 'Gazebo.xacro'))
+    else:
+        root.appendChild(ur.short(doc,'xacro:include','filename',args.output[0:args.output.find('.')]+ 'Transmission.xacro'))
+        root.appendChild(ur.short(doc,'xacro:include','filename',args.output[0:args.output.find('.')]+ 'Gazebo.xacro'))
+#    if args.output.rfind('/') != -1:
+#        filename = args.output[args.output.rfind('/')+1:args.output.find('.')]+ 'robot' + '.xacro'
+#    else:
     filename = args.output[0:args.output.find('.')]+ 'robot' + str('.xacro')
     print filename
     file = open(filename,'w') 
@@ -444,11 +469,13 @@ def exportXacroRobotChain(robot, keyword):
                             print 'unknown element' + str(chain2[i])        
                 else:
                     duplicate =0
-
+#        if args.output.find('/') != -1:
+#            filenamearms = args.output[args.output.rfind('/')+1:args.output.find('.')] + keyword +str('.xacro')
+#        else:
         filenamearms = args.output[0:args.output.find('.')] + keyword + str('.xacro')
         print filenamearms
         filename = open(filenamearms,'w') 
-        filename.write(doc.toprettyxml()) 
+        filename.write(doc.toprettyxml())
 
 ##############
 #### Main ####
