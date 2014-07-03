@@ -2,8 +2,11 @@ xml_based_urdfparser
 ====================
 
 a python urdf parser based on xml minidom
-the urdf.py and gazebo.py are generic libraries that can be used to parse any URDF file
-the python script 'modify_urdf_devel' converts urdf to REP120 compliant URDF. This script is designed for Aldebaran robots only
+
+Install
+=======
+
+Run python setup.py install
 
 Features
 ========
