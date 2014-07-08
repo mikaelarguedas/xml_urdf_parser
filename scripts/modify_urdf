@@ -401,8 +401,8 @@ def exportXacroRobot(robot):
     exportXacroRobotElementList(robot,'Transmission')
     exportXacroRobotElementList(robot,'Gazebo')
     if args.output.find('/') != -1:
-        root.appendChild(ur.short(doc,'xacro:include','filename',args.output[args.output.rfind('/'):args.output.find('.')]+ 'Transmission.xacro'))
-        root.appendChild(ur.short(doc,'xacro:include','filename',args.output[args.output.rfind('/'):args.output.find('.')]+ 'Gazebo.xacro'))
+        root.appendChild(ur.short(doc,'xacro:include','filename',args.output[args.output.rfind('/')+1:args.output.find('.')]+ 'Transmission.xacro'))
+        root.appendChild(ur.short(doc,'xacro:include','filename',args.output[args.output.rfind('/')+1:args.output.find('.')]+ 'Gazebo.xacro'))
     else:
         root.appendChild(ur.short(doc,'xacro:include','filename',args.output[0:args.output.find('.')]+ 'Transmission.xacro'))
         root.appendChild(ur.short(doc,'xacro:include','filename',args.output[0:args.output.find('.')]+ 'Gazebo.xacro'))

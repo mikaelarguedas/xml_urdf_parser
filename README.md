@@ -6,7 +6,8 @@ a python urdf parser based on xml minidom
 Install
 =======
 
-Run python setup.py install
+Download this package and place it in your workspace
+Run catkin_make on your workspace
 
 Features
 ========
@@ -17,11 +18,11 @@ Automatic generation of the entire URDF file or of specific parts of the robot a
 Dependencies 
 ============
 
-xml.dom
-argparse
-subprocess
-the library provided in this package
-nao_meshes package if you want the official Aldebaran meshes
+- xml.dom
+- argparse
+- subprocess
+- the library provided in this package
+- nao_meshes package if you want the official Aldebaran meshes
 
 Changes
 =======
