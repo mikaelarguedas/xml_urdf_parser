@@ -3,12 +3,6 @@ xml_based_urdfparser
 
 a python urdf parser based on xml minidom
 
-Install
-=======
-
-Download this package and place it in your workspace
-Run catkin_make on your workspace
-
 Features
 ========
 
@@ -24,46 +18,30 @@ Dependencies
 - the library provided in this package
 - nao_meshes package if you want the official Aldebaran meshes
 
+Install
+=======
+
+- Download nao_meshes:
+    -- Download https://github.com/vrabaud/nao_meshes/blob/master/binaries/naomeshes-0.6.2-linux-x64-installer.run
+    -- run the installer : this will extract a catkin package named nao_meshes at the chosen location
+- Download Nao_Original_URDF:
+    -- Download https://github.com/keulYSMB/AldebaranURDF/blob/master/bin/naourdf-0.6-linux-x64-installer.run
+    -- run the installer : this will extract the NAOH25V40.urdf file at the chosen location
+- clone the xml_urdf_parser catkin package : https://github.com/keulYSMB/xml_urdf_parser
+- run catkin_make in your workspace to index nao_meshes and xml_urdf_parser
+
+How to use it
+=============
+- rosrun xml_urdf_parser modify_urdf -i PATH/TO/OFFICIAL/ALDEBARAN/URDF -o PATH/TO/OUTPUT/URDF/FILE -m Type of mesh ("dae" for gazebo, "mesh" for rviz) -x xacrofiles wanted : ("urdf" for a complete URDF file, "robot" for all the kinematics chains of the robot, "legs" for legs kinematics chains, "arms" for arms kinematics chains...)
+- generate the urdf (if -x != "urdf") : rosrun xacro xacro.py PATH/TO/OUTPUT/URDF/FILErobot.xacro > /WANTED/URDF/FILE/LOCATION
+
+Visualize the results:
+- RVIZ : roslaunch xml_urdf_parser display_meshes.launch pmodel:=PATH/TO/URDF/FILE
+- Gazebo: rosrun gazebo_ros spawn_model -file /home/marguedas/Documents/URDF_XACRO/nao.urdf  -urdf -x 0 -y 1 -z 0.5 -model nao
+
+
 Changes
 =======
-06/25/2014
-----------
-- add transmission and gazebo tags to the parser library
-- add methods to library : add_material, add_gazebo
-- export xacro files using kinematics chains
-- fix scale of meshes in the output files
-- New input parameter : --meshes
-
-06/26/2014
-----------
-- More generic mesh path : file:/// became package://
-- Simplify exportXacroRobotChain function
-- Collisions generated automatically whatever the meshes are
-- Modify gazebo class to handle gazebo without reference
-- Created JointPlugin class : parsing and export work
-- validated: gazebo joints, gazebo links without plugin, gazebo robot simulation
-
-06/27/2014
-----------
-- Created plugin classes : GenericPlugin, MimicJointPlugin, BumperPlugin, LaserPlugin, IMUPlugin, VideoPlugin, OdometryPlugin, CameraPlugin,
-- Created Sensor class but not fully implemented
-
-06/30/2014
-----------
-- Created : IMU_LaserPlugin, CameraSensor, Range, Scan, Horizontal, Ray, Image, Noise
-- Validated all plugins : still have to debug HokuyoSensor
-
-07/01/2014
-----------
-- Debugged/Validated all sensors + plugins
-- Solved the sensor/pose issue (not the same format as urdf)
-
-07/02/2014
-----------
-- split library into 2 files :
-        - urdf.py
-        - gazebo.py
-- catkinized package
 
 07/03/2014
 ---------
