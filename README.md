@@ -23,15 +23,18 @@ Install
 
 Download nao_meshes:
 ----------------------
-    - Download https://github.com/vrabaud/nao_meshes/blob/master/binaries/naomeshes-0.6.2-linux-x64-installer.run
-    - run the installer : this will extract a catkin package named nao_meshes at the chosen location
+- Download https://github.com/vrabaud/nao_meshes/blob/master/binaries/naomeshes-0.6.2-linux-x64-installer.run
+- run the installer : this will extract a catkin package named nao_meshes at the chosen location
+
 Download Nao_Original_URDF:
 ---------------------------
-    - Download https://github.com/keulYSMB/AldebaranURDF/blob/master/bin/naourdf-0.6-linux-x64-installer.run
-    - run the installer : this will extract the NAOH25V40.urdf file at the chosen location
+- Download https://github.com/keulYSMB/AldebaranURDF/blob/master/bin/naourdf-0.6-linux-x64-installer.run
+- run the installer : this will extract the NAOH25V40.urdf file at the chosen location
+
 Download xml_urdf_parser package
 --------------------------------
 - clone the xml_urdf_parser catkin package : https://github.com/keulYSMB/xml_urdf_parser
+
 Update your workspace
 ---------------------
 - run catkin_make in your workspace to index nao_meshes and xml_urdf_parser
