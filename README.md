@@ -2,6 +2,8 @@ xml_based_urdfparser
 ====================
 
 a python urdf parser based on xml minidom
+The library is generic (urdf.py and gazeboUrdf.py)
+The conversion script is specific to Aldebaran Robots (nao, romeo)
 
 Features
 ========
@@ -37,7 +39,7 @@ Download xml_urdf_parser package
 
 Update your workspace
 ---------------------
-- run catkin_make in your workspace to index nao_meshes and xml_urdf_parser
+- run rospack profile in your workspace to index nao_meshes and xml_urdf_parser
 
 How to use it
 =============
@@ -45,7 +47,7 @@ How to use it
 - generate the urdf (if -x != "urdf") : rosrun xacro xacro.py PATH/TO/OUTPUT/URDF/FILErobot.xacro > /WANTED/URDF/FILE/LOCATION
 
 Visualize the results:
-- RVIZ : roslaunch xml_urdf_parser display_meshes.launch pmodel:=PATH/TO/URDF/FILE
+- RVIZ : roslaunch xml_urdf_parser display_meshes.launch model:=PATH/TO/URDF/FILE gui:=true
 - Gazebo: rosrun gazebo_ros spawn_model -file /home/marguedas/Documents/URDF_XACRO/nao.urdf  -urdf -x 0 -y 1 -z 0.5 -model nao
 
 
@@ -54,7 +56,7 @@ Changes
 
 07/03/2014
 ---------
-- recatkinized package : update __ini__.py, CMakeLists.txt
+- recatkinized package : update __init__.py, CMakeLists.txt
 - add sonar frames to urdf generation
 - bugfix : path of included files in ..robot.xacro file
 

@@ -42,8 +42,6 @@ parser.add_argument('-r','--REP120', choices=['true','false'], default='true',
 help='Rename the links to be REP120 compliant')
 parser.add_argument('-t','--texture', choices=['true','false'],
 default='false', help='Add textures to visual elements')
-#parser.add_argument('-s','--sensor', choices=['true','false'],
-#default='true', help='Add/Remove sensor frames')
 parser.add_argument('-x','--xacro', choices=['urdf','robot','torso','legs','arms'],
 default='robot', help='Chose output files')
 
@@ -57,7 +55,6 @@ dictioNaoXacro= {
 'arms':'gripper',
 'torso':'torso',
 'sonar':'Sonar',
-#'robot':'',
 }
 
 dictioNao = {
@@ -105,7 +102,6 @@ Nao_offsets = {
 'CameraBottomOffsetZ':2.381e-2,
 'CameraBottomRotY':0.6981,
 }
-#wrist
 Nao_visu = {
 'torso': ur.Cylinder(0.015,0.2115),       	        # collada
 'Head':ur.Cylinder(0.04,0.14),                 # collada
@@ -207,11 +203,6 @@ def REP120func(robot):
                  
         except KeyError:
             pass
-#libroboticsgroup_gazebo_mimic_joint_plugin.so
-#    for joint in robot.joints:
-#        if joint.mimic!=None:
-#            robot.add_gazebo(ur.Gazebo(None,None,None,None,None,None,None,None,None,None,None,None,None,None,[ur.MimicJointPlugin(str(joint.name) + '_mimic','libroboticsgroup_gazebo_mimic_joint_plugin.so',joint.name,,1,None )))
-
 
     if name == 'nao':
         print 'adding nao missing joints and links'
@@ -283,6 +274,7 @@ def MeshesRes(robot,meshes):
     global version
     global name
     global args
+    global diclinks
     a=''
     cmd = 'rospack find '+str(name)+'_meshes'
     mesh_installed = 0
@@ -299,33 +291,22 @@ def MeshesRes(robot,meshes):
         if os.path.isdir(pathmeshes + '/meshes/' + str(version)):
             for link in robot.links:
                 try: 
-                    if args.meshes=='mesh':
-                        file_list = sorted(os.listdir(pathmeshes +'/meshes/' + str(version) + '/visual'))
-                    else:
-                        file_list = sorted(os.listdir(pathmeshes +'/meshes/' + str(version) + '/visual/collada'))
+                    file_list = sorted(os.listdir(pathmeshes +'/meshes/' + str(version) + '/visual'))
                     found = False
+                    print link
                     for file in file_list:
                         if robot.links[link].name.endswith("Link"):
-                            if file.startswith(robot.links[link].name[:-4]) and not file.endswith('.mtl'):
+                            if file.startswith(robot.links[link].name[:-4]) and file.endswith('.dae') :
                                 robot.links[link].visual = None
-                                if args.meshes=='mesh':
-
-                                    robot.links[link].visual = ur.Visual(ur.Mesh('',(0.001,0.001,0.001)))
-                                    robot.links[link].visual.geometry.filename =  'package://nao_meshes/meshes/' + str(version) + '/visual/' + file
-                                else:
-                                    robot.links[link].visual = ur.Visual(ur.Mesh('',(0.1,0.1,0.1)))
-                                    robot.links[link].visual.geometry.filename =  'package://nao_meshes/meshes/' + str(version) + '/visual/collada/' + file
+                                robot.links[link].visual = ur.Visual(ur.Mesh('',(0.1,0.1,0.1)))
+                                robot.links[link].visual.geometry.filename =  'package://nao_meshes/meshes/' + str(version) + '/visual/' + file
                                 found = True   
                                 break
                         else:
-                            if file.startswith(robot.links[link].name) and not file.endswith('.mtl'):
+                            if file.startswith(robot.links[link].name) and file.endswith('.dae'):
                                 robot.links[link].visual = None
-                                if args.meshes=='mesh':
-                                    robot.links[link].visual = ur.Visual(ur.Mesh('',(0.001,0.001,0.001)))
-                                    robot.links[link].visual.geometry.filename =  'package://nao_meshes/meshes/' + str(version) + '/visual/' + file
-                                else:
-                                    robot.links[link].visual = ur.Visual(ur.Mesh('',(0.1,0.1,0.1)))
-                                    robot.links[link].visual.geometry.filename =  'package://nao_meshes/meshes/' + str(version) + '/visual/collada/' + file
+                                robot.links[link].visual = ur.Visual(ur.Mesh('',(0.1,0.1,0.1)))
+                                robot.links[link].visual.geometry.filename =  'package://nao_meshes/meshes/' + str(version) + '/visual/' + file
                                 found = True   
                                 break
                         if found == False:
@@ -334,10 +315,9 @@ def MeshesRes(robot,meshes):
                     pass
                 if found == True:
                     if args.meshes == 'mesh':
-                        colfile =  str(robot.links[link].visual.geometry.filename[0:robot.links[link].visual.geometry.filename.find('visual')]) + 'collision' + str(robot.links[link].visual.geometry.filename[robot.links[link].visual.geometry.filename.find('visual')+6:-4]) + '.ply' 
-                    else: 
                         colfile =  str(robot.links[link].visual.geometry.filename[0:robot.links[link].visual.geometry.filename.find('visual')]) + 'collision' + str(robot.links[link].visual.geometry.filename[robot.links[link].visual.geometry.filename.find('visual')+6:-4]) + '.dae' 
-#                        colfile =  robot.links[link].visual.geometry.filename
+                    else: 
+                        colfile =  str(robot.links[link].visual.geometry.filename[0:robot.links[link].visual.geometry.filename.find('visual')]) + 'collision' + str(robot.links[link].visual.geometry.filename[robot.links[link].visual.geometry.filename.find('visual')+6:-4]) + '.stl' 
                     robot.links[link].collision =  ur.Collision(ur.Mesh(colfile, robot.links[link].visual.geometry.scale))
     # 'include visuals xacro from Armin'
         else:
@@ -354,6 +334,7 @@ def MeshesRes(robot,meshes):
 #################################
 ######## XACRO FUNCTIONS ########
 #################################
+
 def exportXacroRobotElementList(robot,element):
     doc = Document()
     root = doc.createElement("robot")
@@ -367,16 +348,12 @@ def exportXacroRobotElementList(robot,element):
                     print i
                     root.appendChild(i.to_xml(doc))
             elif element == 'Gazebo':
-#                if i.reference != None:
                 if i.reference != None:
                     root.appendChild(i.to_xml(doc))
                 elif i.plugins != []:
                     root.appendChild(i.to_xml(doc))
         except AttributeError:
             pass
-#    if args.output.find('/') != -1:
-#        filename = args.output[args.output.rfind('/')+1:args.output.find('.')]+ str(element) + '.xacro'
-#    else : 
     filename = args.output[0:args.output.find('.')]+ str(element) + '.xacro'
     print filename
     file = open(filename,'w') 
@@ -406,9 +383,6 @@ def exportXacroRobot(robot):
     else:
         root.appendChild(ur.short(doc,'xacro:include','filename',args.output[0:args.output.find('.')]+ 'Transmission.xacro'))
         root.appendChild(ur.short(doc,'xacro:include','filename',args.output[0:args.output.find('.')]+ 'Gazebo.xacro'))
-#    if args.output.rfind('/') != -1:
-#        filename = args.output[args.output.rfind('/')+1:args.output.find('.')]+ 'robot' + '.xacro'
-#    else:
     filename = args.output[0:args.output.find('.')]+ 'robot' + str('.xacro')
     print filename
     file = open(filename,'w') 
@@ -469,9 +443,6 @@ def exportXacroRobotChain(robot, keyword):
                             print 'unknown element' + str(chain2[i])        
                 else:
                     duplicate =0
-#        if args.output.find('/') != -1:
-#            filenamearms = args.output[args.output.rfind('/')+1:args.output.find('.')] + keyword +str('.xacro')
-#        else:
         filenamearms = args.output[0:args.output.find('.')] + keyword + str('.xacro')
         print filenamearms
         filename = open(filenamearms,'w') 
@@ -503,12 +474,10 @@ if version != '':
 
     print'processing ' + str(name) + " robot's urdf file"
      
+    MeshesRes(robot,args.meshes)
     if args.REP120=='true':
         if(name != 'pepper'):
             REP120func(robot)
-    MeshesRes(robot,args.meshes)
-    #if args.sensor == 'false':
-    #    RemoveNoInertia(robot)
     if args.xacro == 'robot':
         exportXacroRobot(robot)
     elif args.xacro == 'urdf':
